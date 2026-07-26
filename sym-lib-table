@@ -1,2 +1,4 @@
 (sym_lib_table
+	(version 7)
+	(lib (name "electrified") (type "KiCad") (uri "${KIPRJMOD}/libraries/kicad-library/electrified-symbols") (options "") (descr ""))
 )
