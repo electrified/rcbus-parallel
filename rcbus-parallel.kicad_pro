@@ -52,7 +52,7 @@
         "zones": {
           "45_degree_only": true,
           "border_display_style": 2,
-          "border_hatch_pitch": 0.5,
+          "border_hatch_pitch": 0.508,
           "corner_radius": 0.0,
           "corner_smoothing": 0,
           "fill_mode": 0,
@@ -63,14 +63,20 @@
           "hatch_thickness": 1.0,
           "min_clearance": 0.508,
           "min_island_area": 10.0,
-          "min_thickness": 0.25,
+          "min_thickness": 0.5,
           "pad_connection": 1,
           "remove_islands": 0,
           "thermal_relief_gap": 0.5,
-          "thermal_relief_spoke_width": 0.5
+          "thermal_relief_spoke_width": 0.508
         }
       },
-      "diff_pair_dimensions": [],
+      "diff_pair_dimensions": [
+        {
+          "gap": 0.0,
+          "via_gap": 0.0,
+          "width": 0.0
+        }
+      ],
       "drc_exclusions": [],
       "meta": {
         "filename": "board_design_settings.json",
@@ -241,7 +247,12 @@
           "spacing": 0.6
         }
       },
-      "via_dimensions": [],
+      "via_dimensions": [
+        {
+          "diameter": 0.0,
+          "drill": 0.0
+        }
+      ],
       "zones_allow_external_fillets": false,
       "zones_use_no_outline": true
     },
@@ -530,7 +541,6 @@
         "bus_width": 12,
         "clearance": 0.127,
         "diff_pair_gap": 0.25,
-        "diff_pair_via_gap": 0.25,
         "diff_pair_width": 0.2,
         "line_style": 0,
         "microvia_diameter": 0.762,
@@ -573,7 +583,7 @@
       "netlist": "",
       "plot": "",
       "pos_files": "",
-      "specctra_dsn": "",
+      "specctra_dsn": "rcbus-parallel.dsn",
       "step": "",
       "svg": "",
       "vrml": ""
@@ -716,7 +726,7 @@
         "uuid": "5ecddffe-3a12-4cde-a65e-8f19a4040ec7"
       }
     ],
-    "used_designators": "H1,C1-3,J2,#PWR9-10,#PWR12,#PWR15,#PWR17-18",
+    "used_designators": "H1,C1-3,J1-2,#PWR9-10,#PWR12,#PWR15,#PWR17-18",
     "variants": []
   },
   "sheets": [
