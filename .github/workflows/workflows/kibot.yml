@@ -1,0 +1,120 @@
+name: "RCBus Parallel build"
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**/*.kicad_pcb'
+      - '**/*.kicad_sch'
+      - '**/*.kibot.yaml'
+      - '.github/workflows/kibot.yml'
+  pull_request:
+    branches:
+      - '**'
+    paths:
+      - '**/*.kicad_pcb'
+      - '**/*.kicad_sch'
+      - '**/*.kibot.yaml'
+      - '.github/workflows/kibot.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: '0'
+        submodules: recursive
+        
+    - name: Initialize and debug git submodules
+      shell: bash
+      run: |
+        echo "Submodule status (before):"
+        git submodule status --recursive || true
+        git submodule sync --recursive
+        echo "Running verbose update:"
+        GIT_TRACE=1 GIT_CURL_VERBOSE=1 git submodule update --init --recursive
+
+    - name: Get next version
+      id: version
+      shell: bash
+      run: |
+        chmod +x .github/scripts/calculate-version.sh
+        if [[ "${{ github.event_name }}" == "release" && -n "${{ github.event.release.tag_name }}" ]]; then
+          VERSION="${{ github.event.release.tag_name }}"
+        else
+          VERSION="$($(pwd)/.github/scripts/calculate-version.sh)"
+        fi
+        echo "Computed version: $VERSION"
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+    - name: Quick Start
+      uses: INTI-CMNB/KiBot@v2_k10
+      with:
+        dir: Generated
+
+    - name: Archive Generated for release
+      run: |
+        if ! command -v zip >/dev/null; then sudo apt-get update && sudo apt-get install -y zip; fi
+        zip -r "rcbus-parallel-${{ env.VERSION }}.zip" Generated
+
+    - name: Release version
+      uses: softprops/action-gh-release@v2
+      if: ${{ github.event_name != 'pull_request' && (github.ref_type == 'tag' || github.event_name == 'release') }}
+      with:
+        draft: false
+        prerelease: false
+        tag_name: ${{ github.event.release.tag_name || env.VERSION }}
+        files: |
+          "rcbus-parallel-${{ env.VERSION }}.zip"
+
+    - name: Retrieve results
+      uses: actions/upload-artifact@v5
+      with:
+        name: Automatic_outputs
+        path: Generated
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Retrieve results
+      uses: actions/download-artifact@v6
+      with:
+        name: Automatic_outputs
+        path: Generated
+
+    - name: Disable Jekyll
+      run: |
+        touch Generated/.nojekyll
+
+    - name: Derive deployment folder
+      run: |
+        DEPLOY_SUBDIR="${{ needs.build.outputs.version }}"
+        echo "DEPLOY_SUBDIR=$DEPLOY_SUBDIR" >> "$GITHUB_ENV"
+
+    - name: Deploy navigate results
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        personal_token: ${{ secrets.TOKEN }}
+        external_repository: electrified/rcbus-tang-9k-site
+        publish_branch: main
+        publish_dir: ./Generated
+        destination_dir: ${{ env.DEPLOY_SUBDIR }}
+        keep_files: true
+        allow_empty_commit: false
+        enable_jekyll: false
