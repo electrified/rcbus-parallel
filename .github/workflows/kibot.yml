@@ -111,7 +111,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         personal_token: ${{ secrets.TOKEN }}
-        external_repository: electrified/rcbus-tang-9k-site
+        external_repository: electrified/rcbus-parallel-site
         publish_branch: main
         publish_dir: ./Generated
         destination_dir: ${{ env.DEPLOY_SUBDIR }}
