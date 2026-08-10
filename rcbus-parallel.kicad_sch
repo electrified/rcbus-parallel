@@ -6,9 +6,10 @@
 	(paper "A4")
 	(title_block
 		(title "RCBus 82c55 parallel interface")
-		(date "2022-07-25")
-		(rev "3")
+		(date "${DATE}")
+		(rev "${VERSION}")
 		(company "Ed Brindley")
+		(comment 2 "${GIT_HASH}")
 	)
 	(lib_symbols
 		(symbol "74xx:74HCT04"
